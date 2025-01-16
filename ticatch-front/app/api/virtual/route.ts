@@ -37,8 +37,8 @@ export async function POST() {
 const startTicketing = async () => {
   console.log("Starting ticketing simulation...");
 
-  const userCount = 10000;
-  const batchSize = 100;
+  const userCount = 1000;
+  const batchSize = 10;
   // const intervalMs = 1; // 1ms 간격
 
   for (let i = 0; i < userCount; i += batchSize) {
@@ -47,20 +47,40 @@ const startTicketing = async () => {
       break; // 중단 플래그가 설정되면 루프 중지
     }
     const batch = Array.from({ length: batchSize }, (_, index) => i + index);
-    await Promise.all(
+     // 병렬로 요청 실행
+     await Promise.all(
       batch.map(async (id) => {
         const requestTime = new Date();
-        const response = await axiosClient.get("/api/auth/login/kakao");
-        console.log(
-          `유저 ${
-            id + 1
-          } 요청, 요청 시간 : ${requestTime.toISOString()} ${requestTime.getTime()}ms, ${
-            response.data
-          }`
-        ); // -> post 요청
+
+        try {
+          const generateUniqueString = (): string => {
+            const timestamp = Date.now().toString(36); 
+            const random = Math.random().toString(36).substring(2, 12);
+            return `${timestamp}-${random}`;
+          };
+          const response = await axiosClient.get(`/api/test/request?userId=${generateUniqueString()}`,{
+            headers: {
+              "Content-Type": "application/json"
+            }
+          });
+          console.log(
+            `유저 ${
+              id + 1
+            } 요청, 요청 시간 : ${requestTime.toISOString()} ${requestTime.getTime()}ms, ${
+              response.data
+            }`
+          );
+        } catch (error) {
+          if (error instanceof Error) {
+            console.log(`유저 ${id + 1} 요청 실패: ${error.message}`);
+          } else {
+            console.log('알 수 없는 에러');
+          }
+        }
       })
     );
+
     console.log(`배치 ${i / batchSize + 1}`);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // 배치 간 지연
   }
 };
