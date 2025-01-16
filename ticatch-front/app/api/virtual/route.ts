@@ -3,7 +3,7 @@ import axiosClient from "lib/axiosClient";
 
 export const runtime = "nodejs"; // Node.js 환경에서 실행
 
-let isSimulationRunning = true;
+// let isSimulationRunning = true;
 
 export async function GET() {
   const serverStartTime = new Date(Date.now() + 5000); // 현재 시간 + 5초
@@ -28,11 +28,11 @@ export async function GET() {
   return NextResponse.json({ message: "Simulation scheduled successfully." });
 }
 
-export async function POST() {
-  console.log("Simulation stopped!");
-  isSimulationRunning = false; // 실행 중단 플래그 설정
-  return NextResponse.json({ message: "Simulation stopped successfully." });
-}
+// export async function POST() {
+//   console.log("Simulation stopped!");
+//   isSimulationRunning = false; // 실행 중단 플래그 설정
+//   return NextResponse.json({ message: "Simulation stopped successfully." });
+// }
 
 const startTicketing = async () => {
   console.log("Starting ticketing simulation...");
@@ -42,10 +42,10 @@ const startTicketing = async () => {
   // const intervalMs = 1; // 1ms 간격
 
   for (let i = 0; i < userCount; i += batchSize) {
-    if (!isSimulationRunning) {
-      console.log("Simulation has been stopped!");
-      break; // 중단 플래그가 설정되면 루프 중지
-    }
+    // if (!isSimulationRunning) {
+    //   console.log("Simulation has been stopped!");
+    //   break; // 중단 플래그가 설정되면 루프 중지
+    // }
     const batch = Array.from({ length: batchSize }, (_, index) => i + index);
      // 병렬로 요청 실행
      await Promise.all(
