@@ -50,7 +50,7 @@ const startTicketing = async () => {
     await Promise.all(
       batch.map(async (id) => {
         const requestTime = new Date();
-        const response = await axiosClient.get("/");
+        const response = await axiosClient.get("/api/auth/login/kakao");
         console.log(
           `유저 ${
             id + 1
