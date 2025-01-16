@@ -71,7 +71,11 @@ const startTicketing = async () => {
             }`
           );
         } catch (error) {
-          console.log(`유저 ${id + 1} 요청 실패: ${error.message}`);
+          if (error instanceof Error) {
+            console.log(`유저 ${id + 1} 요청 실패: ${error.message}`);
+          } else {
+            console.log('알 수 없는 에러');
+          }
         }
       })
     );
