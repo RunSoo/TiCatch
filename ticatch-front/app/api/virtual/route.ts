@@ -16,10 +16,11 @@ export async function GET() {
 
   if (delay > 0) {
     console.log(`Waiting for ${delay}ms before starting...`);
-    setTimeout(() => {
-      console.log("Simulation started!");
-      startTicketing();
-    }, delay);
+    // setTimeout(() => {
+    //   console.log("Simulation started!");
+    //   startTicketing();
+    // }, delay);
+    startTicketing();
   } else {
     console.log("Start time already passed, starting immediately.");
     startTicketing();
