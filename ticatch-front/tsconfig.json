@@ -25,7 +25,8 @@
       "@features/*": ["features/*"],
       "@hooks/*": ["hooks/*"],
       "@queries/*": ["queries/*"],
-      "@utils/*": ["utils/*"]
+      "@utils/*": ["utils/*"],
+      "@types": ["types"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
