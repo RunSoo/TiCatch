@@ -59,7 +59,7 @@ const startTicketing = async () => {
             const random = Math.random().toString(36).substring(2, 12);
             return `${timestamp}-${random}`;
           };
-          const response = await axiosClient.get(`/api/test/request?userId=${generateUniqueString()}`,{
+          const response = await axiosClient.get(`/test/request?userId=${generateUniqueString()}`,{
             headers: {
               "Content-Type": "application/json"
             }
