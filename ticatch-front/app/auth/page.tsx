@@ -1,16 +1,16 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useLoginWithKakao } from '@features/auth/hooks';
 import { useRouter } from 'next/router';
+import { useLoginWithKakao } from '@features/auth/hooks';
 
 interface AuthPageProps {
-  searchParams: Record<string, string | undefined>;
+  searchParams: { code?: string };
 }
 
-const AuthPage = ({ searchParams }: AuthPageProps) => {
-  const { mutate: loginWithKakao } = useLoginWithKakao();
+export default function AuthPage({ searchParams }: AuthPageProps) {
   const router = useRouter();
+  const { mutate: loginWithKakao } = useLoginWithKakao();
   const code = searchParams?.code;
 
   useEffect(() => {
@@ -26,6 +26,4 @@ const AuthPage = ({ searchParams }: AuthPageProps) => {
   }, [code, loginWithKakao, router]);
 
   return <div>로그인 중...</div>;
-};
-
-export default AuthPage;
+}
