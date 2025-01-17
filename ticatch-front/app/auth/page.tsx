@@ -5,7 +5,7 @@ import { useLoginWithKakao } from '@features/auth/hooks';
 import { useRouter } from 'next/router';
 
 interface AuthPageProps {
-  searchParams: { code?: string };
+  searchParams: Record<string, string | undefined>;
 }
 
 const AuthPage = ({ searchParams }: AuthPageProps) => {
