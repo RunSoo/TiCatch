@@ -11,8 +11,7 @@ interface AuthPageProps {
 const AuthPage = ({ searchParams }: AuthPageProps) => {
   const router = useRouter();
   const { mutate: loginWithKakao } = useLoginWithKakao();
-
-  const code = searchParams.code;
+  const code = searchParams?.code;
 
   useEffect(() => {
     if (!code) {
