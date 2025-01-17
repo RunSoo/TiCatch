@@ -9,7 +9,7 @@ const LoginPage = () => {
   return (
     <div>
       <h1>로그인 페이지</h1>
-      <a href={KAKAO_AUTH_URL}>로그인 ~{KAKAO_AUTH_URL}</a>
+      <a href={KAKAO_AUTH_URL}>로그인 ~</a>
     </div>
   );
 };

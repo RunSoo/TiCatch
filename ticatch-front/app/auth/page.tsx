@@ -1,31 +1,19 @@
-'use client';
-
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useLoginWithKakao } from '@features/auth/hooks';
+import { redirect } from 'next/navigation';
 
 interface AuthPageProps {
   searchParams: { code?: string };
 }
 
-const AuthPage = ({ searchParams }: AuthPageProps) => {
-  const router = useRouter();
-  const { mutate: loginWithKakao } = useLoginWithKakao();
+export default function AuthPage({ searchParams }: AuthPageProps) {
   const code = searchParams?.code;
 
-  useEffect(() => {
-    if (!code) {
-      router.push('/login');
-      return;
-    }
+  if (!code) {
+    redirect('/login'); // 로그인 페이지로 리다이렉트
+  }
 
-    loginWithKakao(code, {
-      onSuccess: () => router.push('/'),
-      onError: () => router.push('/login'),
-    });
-  }, [code, loginWithKakao, router]);
-
-  return <div>로그인 중...</div>;
-};
-
-export default AuthPage;
+  return (
+    <div>
+      <p>로그인 중...</p>
+    </div>
+  );
+}
