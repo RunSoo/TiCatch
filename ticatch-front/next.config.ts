@@ -5,9 +5,6 @@ const nextConfig: NextConfig = {
   //   reactCompiler: true,
   //   ppr: 'incremental'
   // }
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
 };
 
 export default nextConfig;
