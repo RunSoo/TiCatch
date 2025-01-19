@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: `http://13.54.208.249:8080/api`,
+  baseURL: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`,
   withCredentials: true,
 });
 
