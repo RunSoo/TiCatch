@@ -20,6 +20,7 @@ export const loginWithKakao = async (code: string): Promise<LoginResponse> => {
     params: { code },
   });
 
+  console.log('API 응답 데이터: ', response.data);
   const accessToken = response.data?.data?.tokenDto?.accessToken;
   if (accessToken) {
     localStorage.setItem('accessToken', accessToken);
