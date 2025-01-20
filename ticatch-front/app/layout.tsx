@@ -42,9 +42,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={pretendard.variable}>
-        <Providers dehydratedState={dehydratedState}>
-          {children}
-        </Providers>
+        <Providers dehydratedState={dehydratedState}>{children}</Providers>
       </body>
     </html>
   );

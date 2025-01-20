@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLoginWithKakao } from '@features/auth/hooks';
+import { loginWithKakao } from '@features/auth/api';
 
 interface ClientAuthPageProps {
   code: string;
@@ -10,14 +10,19 @@ interface ClientAuthPageProps {
 
 const ClientAuthPage = ({ code }: ClientAuthPageProps) => {
   const router = useRouter();
-  const { mutate: loginWithKakao } = useLoginWithKakao();
 
   useEffect(() => {
-    loginWithKakao(code, {
-      onSuccess: () => router.push('/'),
-      onError: () => router.push('/login'),
-    });
-  }, [code, loginWithKakao, router]);
+    const handleLogin = async () => {
+      try {
+        await loginWithKakao(code);
+        router.push('/');
+      } catch (error) {
+        console.log('로그인 실패: ', error);
+        router.push('/login');
+      }
+    };
+    handleLogin();
+  }, [code, router]);
 
   return <div>로그인 중...</div>;
 };

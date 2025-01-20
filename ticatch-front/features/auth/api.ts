@@ -20,5 +20,12 @@ export const loginWithKakao = async (code: string): Promise<LoginResponse> => {
     params: { code },
   });
 
+  const accessToken = response.data.accessToken;
+  if (accessToken) {
+    localStorage.setItem('accessToken', accessToken);
+  } else {
+    throw new Error('Access Token이 없습니다.');
+  }
+
   return response.data;
 };
