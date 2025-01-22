@@ -21,7 +21,7 @@ const AuthPage = () => {
       }
     };
     handleLogin();
-  }, [router]);
+  }, [router, searchParams]);
 
   // TODO: 로딩 스피너 도입
   return <div>로그인 중</div>;
