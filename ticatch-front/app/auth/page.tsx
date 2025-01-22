@@ -1,32 +1,17 @@
-'use client';
+import { redirect } from 'next/navigation';
+import AuthPageClient from './AuthPageClient';
 
-import { loginWithKakao } from 'api';
-import { useSearchParams } from 'next/navigation';
-import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+interface AuthPageProps {
+  searchParams: Promise<Record<string, string | undefined>>;
+}
 
-export const dynamic = 'force-dynamic';
+export default async function AuthPage({ searchParams }: AuthPageProps) {
+  const params = await searchParams;
+  const code = params?.code;
 
-const AuthPage = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  if (!code) {
+    redirect('/login');
+  }
 
-  useEffect(() => {
-    const handleLogin = async () => {
-      const code = searchParams.get('code') ?? '';
-      try {
-        await loginWithKakao(code);
-        router.push('/');
-      } catch (error) {
-        console.log('로그인 실패: ', error);
-        router.push('/login');
-      }
-    };
-    handleLogin();
-  }, [router, searchParams]);
-
-  // TODO: 로딩 스피너 도입
-  return <div>로그인 중</div>;
-};
-
-export default AuthPage;
+  return <AuthPageClient code={code} />;
+}
