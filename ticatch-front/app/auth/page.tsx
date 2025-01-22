@@ -5,6 +5,8 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
+export const dynamic = 'force-dynamic';
+
 const AuthPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
