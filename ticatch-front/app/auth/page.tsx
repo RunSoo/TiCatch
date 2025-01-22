@@ -1,20 +1,17 @@
 'use client';
 
 import { loginWithKakao } from 'api';
+import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
-interface AuthPageProps {
-  searchParams: Promise<Record<string, string | undefined>>;
-}
-
-const AuthPage = async ({ searchParams }: AuthPageProps) => {
+const AuthPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const handleLogin = async () => {
-      const params = await searchParams;
-      const code = params?.code ?? '';
+      const code = searchParams.get('code') ?? '';
       try {
         await loginWithKakao(code);
         router.push('/');
