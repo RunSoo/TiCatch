@@ -11,6 +11,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // matcher: ['/ticket/level'],
-  matcher: [],
+  matcher: ['/ticket/:path*'],
+  // matcher: [],
 };
