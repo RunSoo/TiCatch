@@ -10,18 +10,20 @@ export async function GET(req: NextRequest) {
     console.log('✅ 요청 경로:', req.nextUrl.pathname);
     console.log('➡️ 프록시 대상 URL:', targetURL);
 
-    const headers = {
-      Authorization: req.headers.get('authorization') || '',
-      Cookie: req.headers.get('cookie') || '',
+    const cookieHeader = req.headers.get('cookie') || '';
+    const authorizationHeader = req.headers.get('authorization') || '';
+
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 
-    console.log('🔑 Authorization:', headers.Authorization);
-    console.log('🍪 쿠키:', headers.Cookie);
+    // ✅ 쿠키 또는 Authorization이 있을 때만 추가
+    if (cookieHeader) headers['Cookie'] = cookieHeader;
+    if (authorizationHeader) headers['Authorization'] = authorizationHeader;
 
     const response = await axios.get(targetURL, {
       headers,
-      withCredentials: true,
+      withCredentials: !!cookieHeader, // ✅ 쿠키가 있을 경우에만 전송
     });
 
     return NextResponse.json(response.data);
@@ -43,15 +45,19 @@ export async function POST(req: NextRequest) {
     const targetPath = req.nextUrl.pathname.replace('/api/proxy', '');
     const targetURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}${targetPath}`;
 
-    const headers = {
-      Authorization: req.headers.get('authorization') || '',
-      Cookie: req.headers.get('cookie') || '',
+    const cookieHeader = req.headers.get('cookie') || '';
+    const authorizationHeader = req.headers.get('authorization') || '';
+
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 
+    if (cookieHeader) headers['Cookie'] = cookieHeader;
+    if (authorizationHeader) headers['Authorization'] = authorizationHeader;
+
     const response = await axios.post(targetURL, body, {
       headers,
-      withCredentials: true,
+      withCredentials: !!cookieHeader, // ✅ 쿠키가 있을 경우에만 전송
     });
 
     return NextResponse.json(response.data);
