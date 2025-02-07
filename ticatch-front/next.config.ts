@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   //   reactCompiler: true,
   //   ppr: 'incremental'
   // }
+  output: 'standalone',
 };
 
 export default nextConfig;
