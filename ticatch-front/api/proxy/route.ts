@@ -1,13 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
-export async function POST(req: Request) {
-  const body = await req.json();
-  const backendURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}${req.url.replace('/api/proxy', '')}`;
-
+export async function GET(req: NextRequest) {
   try {
-    const response = await axios.post(backendURL, body, {
+    const url = new URL(req.url);
+    const targetPath = url.pathname.replace('/api/proxy', '');
+    const targetURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}${targetPath}${url.search}`;
+
+    const headers = Object.fromEntries(req.headers);
+
+    const response = await axios.get(targetURL, {
       headers: {
+        ...headers,
         'Content-Type': 'application/json',
       },
       withCredentials: true,
@@ -15,6 +19,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(response.data);
   } catch (error: any) {
+    console.error('❌ 프록시 오류:', error);
     return NextResponse.json(
       { message: 'Proxy Error' },
       { status: error.response?.status || 500 },
@@ -22,12 +27,18 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET(req: Request) {
-  const backendURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}${req.url.replace('/api/proxy', '')}`;
-
+export async function POST(req: NextRequest) {
   try {
-    const response = await axios.get(backendURL, {
+    const body = await req.json();
+    const url = new URL(req.url);
+    const targetPath = url.pathname.replace('/api/proxy', '');
+    const targetURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}${targetPath}`;
+
+    const headers = Object.fromEntries(req.headers);
+
+    const response = await axios.post(targetURL, body, {
       headers: {
+        ...headers,
         'Content-Type': 'application/json',
       },
       withCredentials: true,
@@ -35,6 +46,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json(response.data);
   } catch (error: any) {
+    console.error('❌ 프록시 오류:', error);
     return NextResponse.json(
       { message: 'Proxy Error' },
       { status: error.response?.status || 500 },
