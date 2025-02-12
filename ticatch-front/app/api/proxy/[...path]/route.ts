@@ -70,7 +70,9 @@ export async function POST(req: NextRequest) {
       withCredentials: true,
     });
 
-    const res = NextResponse.json(response.data);
+    const res = response.data
+      ? NextResponse.json(response.data)
+      : new NextResponse(null, { status: response.status });
     const setCookieHeader = response.headers['set-cookie'];
 
     // ✅ POST 요청에서도 Set-Cookie 처리
@@ -101,7 +103,11 @@ export async function POST(req: NextRequest) {
     console.error('⚠️ 에러 상태 코드:', error.response?.status || 500);
 
     return NextResponse.json(
-      { message: 'Proxy Error', details: error.message },
+      {
+        message: 'Proxy Error',
+        details: error.message,
+        backendError: error.response?.data || null,
+      },
       { status: error.response?.status || 500 },
     );
   }
