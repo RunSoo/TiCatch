@@ -18,10 +18,11 @@ export async function GET(req: NextRequest) {
       withCredentials: true,
     });
 
-    // ✅ 프록시 응답에 Set-Cookie 전달
-    const res = NextResponse.json(response.data);
-    const setCookieHeader = response.headers['set-cookie'];
+    const res = response.data
+      ? NextResponse.json(response.data)
+      : new NextResponse(null, { status: response.status });
 
+    const setCookieHeader = response.headers['set-cookie'];
     if (setCookieHeader) {
       console.log('🍪 Set-Cookie 헤더 발견:', setCookieHeader);
       res.headers.set('Set-Cookie', setCookieHeader[0]);
@@ -70,15 +71,22 @@ export async function POST(req: NextRequest) {
       withCredentials: true,
     });
 
-    const res = response.data
-      ? NextResponse.json(response.data)
-      : new NextResponse(null, { status: response.status });
+    // ✅ 빈 응답 처리 강화
+    if (
+      response.status === 204 ||
+      response.data === undefined ||
+      response.data === null ||
+      (typeof response.data === 'string' && !response.data.trim())
+    ) {
+      console.log('ℹ️ 빈 응답 또는 204 No Content');
+      return new NextResponse(null, { status: response.status });
+    }
+
+    const res = NextResponse.json(response.data);
     const setCookieHeader = response.headers['set-cookie'];
 
-    // ✅ POST 요청에서도 Set-Cookie 처리
     if (setCookieHeader) {
       console.log('🍪 Set-Cookie 헤더 발견:', setCookieHeader);
-
       if (Array.isArray(setCookieHeader)) {
         setCookieHeader.forEach((cookie) =>
           res.headers.append('Set-Cookie', cookie),
@@ -99,16 +107,22 @@ export async function POST(req: NextRequest) {
       body: req.body,
     });
 
-    console.error('📤 응답 정보:', error.response?.data || error.message);
-    console.error('⚠️ 에러 상태 코드:', error.response?.status || 500);
+    if (error.response) {
+      console.error('📤 응답 정보:', error.response.data);
+      return NextResponse.json(
+        {
+          message: 'Proxy Error',
+          details: error.message,
+          backendError: error.response.data,
+        },
+        { status: error.response.status },
+      );
+    }
 
+    console.error('⚠️ 네트워크 오류 또는 서버 응답 없음:', error.message);
     return NextResponse.json(
-      {
-        message: 'Proxy Error',
-        details: error.message,
-        backendError: error.response?.data || null,
-      },
-      { status: error.response?.status || 500 },
+      { message: 'Proxy Error', details: error.message },
+      { status: 500 },
     );
   }
 }
