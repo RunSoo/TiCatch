@@ -18,14 +18,29 @@ export async function GET(req: NextRequest) {
       withCredentials: true,
     });
 
-    const res = response.data
-      ? NextResponse.json(response.data)
-      : new NextResponse(null, { status: response.status });
+    // ✅ 빈 응답 처리
+    if (
+      response.status === 204 ||
+      response.data === undefined ||
+      response.data === null ||
+      (typeof response.data === 'string' && !response.data.trim())
+    ) {
+      console.log('ℹ️ 빈 응답 또는 204 No Content');
+      return new NextResponse(null, { status: response.status });
+    }
 
+    const res = NextResponse.json(response.data);
     const setCookieHeader = response.headers['set-cookie'];
+
     if (setCookieHeader) {
       console.log('🍪 Set-Cookie 헤더 발견:', setCookieHeader);
-      res.headers.set('Set-Cookie', setCookieHeader[0]);
+      if (Array.isArray(setCookieHeader)) {
+        setCookieHeader.forEach((cookie) =>
+          res.headers.append('Set-Cookie', cookie),
+        );
+      } else {
+        res.headers.set('Set-Cookie', setCookieHeader);
+      }
     } else {
       console.log('❌ Set-Cookie 없음');
     }
@@ -57,7 +72,7 @@ export async function POST(req: NextRequest) {
     };
 
     if (!isLoginRequest) {
-      const authToken = req.headers.get('authorization') || '';
+      const authToken = req.headers.get('authorization');
       const cookie = req.headers.get('cookie') || '';
 
       if (authToken) headers['Authorization'] = authToken;
@@ -71,7 +86,7 @@ export async function POST(req: NextRequest) {
       withCredentials: true,
     });
 
-    // ✅ 빈 응답 처리 강화
+    // ✅ 빈 응답 처리
     if (
       response.status === 204 ||
       response.data === undefined ||
