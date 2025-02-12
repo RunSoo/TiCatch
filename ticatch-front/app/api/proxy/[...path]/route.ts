@@ -47,10 +47,32 @@ export async function GET(req: NextRequest) {
 
     return res;
   } catch (error: any) {
-    console.error('❌ 프록시 오류:', error);
+    console.error('❌ [프록시 GET 오류 발생]');
+    console.error('📥 요청 정보:', {
+      method: req.method,
+      path: req.nextUrl.pathname,
+      headers: req.headers,
+    });
+
+    if (error.response) {
+      console.error('📤 백엔드 응답 상태:', error.response.status);
+      console.error('📤 백엔드 응답 데이터:', error.response.data);
+      console.error('📤 백엔드 응답 헤더:', error.response.headers);
+
+      return NextResponse.json(
+        {
+          message: 'Proxy Error',
+          details: error.message,
+          backendError: error.response.data,
+        },
+        { status: error.response.status },
+      );
+    }
+
+    console.error('⚠️ 네트워크 오류 또는 서버 응답 없음:', error.message);
     return NextResponse.json(
       { message: 'Proxy Error', details: error.message },
-      { status: error.response?.status || 500 },
+      { status: 500 },
     );
   }
 }
@@ -119,11 +141,15 @@ export async function POST(req: NextRequest) {
     console.error('📥 요청 정보:', {
       method: req.method,
       path: req.nextUrl.pathname,
+      headers: req.headers,
       body: req.body,
     });
 
     if (error.response) {
-      console.error('📤 응답 정보:', error.response.data);
+      console.error('📤 백엔드 응답 상태:', error.response.status);
+      console.error('📤 백엔드 응답 데이터:', error.response.data);
+      console.error('📤 백엔드 응답 헤더:', error.response.headers);
+
       return NextResponse.json(
         {
           message: 'Proxy Error',
