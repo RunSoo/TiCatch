@@ -22,5 +22,4 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: ['/ticket/:path*'],
-  runtime: 'experimental-edge',
 };

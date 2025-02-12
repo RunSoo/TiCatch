@@ -87,7 +87,7 @@ export const logoutUser = async () => {
  * @returns 새로운 accessToken
  */
 export const refreshAccessToken = async () => {
-  const response = await axiosClient.post('/auth/reissue');
+  const response = await axiosClient.get('/auth/reissue');
   return response.data?.data?.tokenDto?.accessToken
     .replace(/^Bearer/, '')
     .trim();
