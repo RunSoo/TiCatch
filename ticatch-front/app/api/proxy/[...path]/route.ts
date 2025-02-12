@@ -10,11 +10,20 @@ export async function GET(req: NextRequest) {
     console.log('✅ 요청 경로:', req.nextUrl.pathname);
     console.log('➡️ 프록시 대상 URL:', targetURL);
 
+    const headers: Record<string, string> = {};
+
+    const authToken = req.headers.get('authorization');
+    const cookie = req.headers.get('cookie') || '';
+
+    if (authToken && authToken !== 'Bearer undefined') {
+      headers['Authorization'] = authToken;
+    }
+    if (cookie) {
+      headers['Cookie'] = cookie;
+    }
+
     const response = await axios.get(targetURL, {
-      headers: {
-        Authorization: req.headers.get('authorization') || '',
-        Cookie: req.headers.get('cookie') || '',
-      },
+      headers,
       withCredentials: true,
     });
 
@@ -97,8 +106,12 @@ export async function POST(req: NextRequest) {
       const authToken = req.headers.get('authorization');
       const cookie = req.headers.get('cookie') || '';
 
-      if (authToken) headers['Authorization'] = authToken;
-      if (cookie) headers['Cookie'] = cookie;
+      if (authToken && authToken !== 'Bearer undefined') {
+        headers['Authorization'] = authToken;
+      }
+      if (cookie) {
+        headers['Cookie'] = cookie;
+      }
     }
 
     console.log('🔑 전송할 헤더:', headers);
