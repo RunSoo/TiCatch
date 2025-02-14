@@ -61,7 +61,9 @@ export async function POST(req: NextRequest) {
 
     if (setCookieHeader) {
       if (Array.isArray(setCookieHeader)) {
-        res.headers.set('Set-Cookie', setCookieHeader[0]);
+        setCookieHeader.forEach((cookie) =>
+          res.headers.append('Set-Cookie', cookie),
+        );
       } else {
         res.headers.set('Set-Cookie', setCookieHeader);
       }
@@ -69,7 +71,6 @@ export async function POST(req: NextRequest) {
 
     return res;
   } catch (error: any) {
-    console.log('POST 프록시 에러: ', error);
     return NextResponse.json(
       { message: 'Proxy Error', details: error.message },
       { status: error.response?.status || 500 },
