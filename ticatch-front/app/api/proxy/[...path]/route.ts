@@ -37,15 +37,19 @@ export async function POST(req: NextRequest) {
     const targetPath = req.nextUrl.pathname.replace('/api/proxy', '');
     const targetURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}${targetPath}`;
 
+    const isLoginRequest = targetPath.includes('/auth/login');
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 
-    const authToken = req.headers.get('authorization') || '';
-    const cookie = req.headers.get('cookie') || '';
+    if (!isLoginRequest) {
+      const authToken = req.headers.get('authorization') || '';
+      const cookie = req.headers.get('cookie') || '';
 
-    if (authToken) headers['Authorization'] = authToken;
-    if (cookie) headers['Cookie'] = cookie;
+      if (authToken) headers['Authorization'] = authToken;
+      if (cookie) headers['Cookie'] = cookie;
+    }
 
     const response = await axios.post(targetURL, body, {
       headers,
@@ -56,7 +60,11 @@ export async function POST(req: NextRequest) {
     const setCookieHeader = response.headers['set-cookie'];
 
     if (setCookieHeader) {
-      res.headers.set('Set-Cookie', setCookieHeader[0]);
+      if (Array.isArray(setCookieHeader)) {
+        res.headers.set('Set-Cookie', setCookieHeader[0]);
+      } else {
+        res.headers.set('Set-Cookie', setCookieHeader);
+      }
     }
 
     return res;
