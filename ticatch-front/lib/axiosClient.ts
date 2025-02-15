@@ -2,7 +2,7 @@ import { refreshAccessToken } from 'api';
 import axios from 'axios';
 
 export const axiosClient = axios.create({
-  baseURL: '/api/proxy',
+  baseURL: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`,
   withCredentials: true,
 });
 

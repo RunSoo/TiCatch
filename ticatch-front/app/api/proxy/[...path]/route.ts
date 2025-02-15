@@ -3,15 +3,31 @@ import axios from 'axios';
 
 export async function GET(req: NextRequest) {
   try {
-    const backendURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}`;
-    const targetPath = req.nextUrl.pathname.replace('/proxy', '');
-    const targetURL = `${backendURL}${targetPath}${req.nextUrl.search}`;
+    const backendURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
+    const targetPath = req.nextUrl.pathname.replace('/api/proxy', '');
+    const targetURL = `${backendURL}${targetPath}`;
+
+    // ✅ 카카오 로그인, 토큰 재발급 요청만 프록시 허용
+    const isAllowedRequest =
+      targetPath.includes('/auth/login/kakao') ||
+      targetPath.includes('/auth/reissue');
+
+    if (!isAllowedRequest) {
+      return NextResponse.json(
+        { message: 'Only auth requests should go through proxy' },
+        { status: 403 },
+      );
+    }
+
+    const headers: Record<string, string> = {
+      Authorization: req.headers.get('authorization') || '',
+      Cookie: req.headers.get('cookie') || '',
+    };
+
+    console.log('🔄 Proxy GET Request:', targetURL, headers);
 
     const response = await axios.get(targetURL, {
-      headers: {
-        Authorization: req.headers.get('authorization') || '',
-        Cookie: req.headers.get('cookie') || '',
-      },
+      headers,
       withCredentials: true,
     });
 
@@ -24,6 +40,10 @@ export async function GET(req: NextRequest) {
 
     return res;
   } catch (error: any) {
+    console.error(
+      '❌ Proxy Error (GET):',
+      error.response?.data || error.message,
+    );
     return NextResponse.json(
       { message: 'Proxy Error', details: error.message },
       { status: error.response?.status || 500 },
@@ -33,29 +53,27 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const backendURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}`;
-    const targetPath = req.nextUrl.pathname.replace('/proxy', '');
+    const backendURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
+    const targetPath = req.nextUrl.pathname.replace('/api/proxy', '');
     const targetURL = `${backendURL}${targetPath}`;
 
-    const isLogoutRequest = targetPath.includes('/auth/logout');
-    const isLoginRequest = targetPath.includes('/auth/login');
+    // ✅ 로그아웃 요청만 프록시 허용
+    if (!targetPath.includes('/auth/logout')) {
+      return NextResponse.json(
+        { message: 'Only auth requests should go through proxy' },
+        { status: 403 },
+      );
+    }
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      Authorization: req.headers.get('authorization') || '',
+      Cookie: req.headers.get('cookie') || '',
     };
 
-    if (!isLoginRequest) {
-      const authToken = req.headers.get('authorization') || '';
-      const cookie = req.headers.get('cookie') || '';
+    console.log('🔄 Proxy POST Request:', targetURL, headers);
 
-      if (authToken) headers['Authorization'] = authToken;
-      if (cookie) headers['Cookie'] = cookie;
-    }
-
-    // 로그아웃 요청이면 body 없이 요청
-    const body = isLogoutRequest ? undefined : await req.json();
-
-    const response = await axios.post(targetURL, body, {
+    const response = await axios.post(targetURL, undefined, {
       headers,
       withCredentials: true,
     });
@@ -76,6 +94,10 @@ export async function POST(req: NextRequest) {
 
     return res;
   } catch (error: any) {
+    console.error(
+      '❌ Proxy Error (POST):',
+      error.response?.data || error.message,
+    );
     return NextResponse.json(
       {
         message: 'Proxy Error',
