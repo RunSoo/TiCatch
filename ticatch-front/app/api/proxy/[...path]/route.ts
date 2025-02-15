@@ -3,8 +3,8 @@ import axios from 'axios';
 
 export async function GET(req: NextRequest) {
   try {
-    const backendURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
-    const targetPath = req.nextUrl.pathname.replace('/api/proxy', '');
+    const backendURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}`;
+    const targetPath = req.nextUrl.pathname.replace('/proxy', '');
     const targetURL = `${backendURL}${targetPath}${req.nextUrl.search}`;
 
     const response = await axios.get(targetURL, {
@@ -33,8 +33,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const backendURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}`;
     const targetPath = req.nextUrl.pathname.replace('/proxy', '');
-    const targetURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}${targetPath}`;
+    const targetURL = `${backendURL}${targetPath}`;
 
     const isLogoutRequest = targetPath.includes('/auth/logout');
     const isLoginRequest = targetPath.includes('/auth/login');
@@ -51,15 +52,12 @@ export async function POST(req: NextRequest) {
       if (cookie) headers['Cookie'] = cookie;
     }
 
-    console.log('🔍 targetURL:', targetURL);
-    console.log('🔍 Headers:', headers);
-
     // 로그아웃 요청이면 body 없이 요청
     const body = isLogoutRequest ? undefined : await req.json();
 
     const response = await axios.post(targetURL, body, {
       headers,
-      withCredentials: true, // ✅ 쿠키 포함
+      withCredentials: true,
     });
 
     const responseData = response.data || { message: 'No response data' };
@@ -78,8 +76,6 @@ export async function POST(req: NextRequest) {
 
     return res;
   } catch (error: any) {
-    console.error('❌ Proxy Error:', error.response?.data || error.message);
-
     return NextResponse.json(
       {
         message: 'Proxy Error',
