@@ -85,9 +85,7 @@ export async function POST(req: NextRequest) {
 
     if (setCookieHeader) {
       if (Array.isArray(setCookieHeader)) {
-        setCookieHeader.forEach((cookie) =>
-          res.headers.append('Set-Cookie', cookie),
-        );
+        res.headers.set('Set-Cookie', setCookieHeader[0]);
       } else {
         res.headers.set('Set-Cookie', setCookieHeader);
       }
