@@ -51,6 +51,11 @@ export async function POST(req: NextRequest) {
       if (cookie) headers['Cookie'] = cookie;
     }
 
+    // 🔍 디버깅 로그
+    console.log('🔍 targetURL:', targetURL);
+    console.log('🔍 Headers:', headers);
+    console.log('🔍 Body:', JSON.stringify(body));
+
     const response = await axios.post(targetURL, body, {
       headers,
       withCredentials: true,
@@ -71,6 +76,7 @@ export async function POST(req: NextRequest) {
 
     return res;
   } catch (error: any) {
+    console.error('❌ Proxy Error:', error.response?.data || error.message);
     return NextResponse.json(
       { message: 'Proxy Error', details: error.message },
       { status: error.response?.status || 500 },
