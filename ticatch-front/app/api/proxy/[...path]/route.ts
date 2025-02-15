@@ -33,10 +33,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const targetPath = req.nextUrl.pathname.replace('/api/proxy', '');
+    const targetPath = req.nextUrl.pathname.replace('/proxy', '');
     const targetURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}${targetPath}`;
 
+    const isLogoutRequest = targetPath.includes('/auth/logout');
     const isLoginRequest = targetPath.includes('/auth/login');
 
     const headers: Record<string, string> = {
@@ -51,17 +51,19 @@ export async function POST(req: NextRequest) {
       if (cookie) headers['Cookie'] = cookie;
     }
 
-    // 🔍 디버깅 로그
     console.log('🔍 targetURL:', targetURL);
     console.log('🔍 Headers:', headers);
-    console.log('🔍 Body:', JSON.stringify(body));
+
+    // 로그아웃 요청이면 body 없이 요청
+    const body = isLogoutRequest ? undefined : await req.json();
 
     const response = await axios.post(targetURL, body, {
       headers,
-      withCredentials: true,
+      withCredentials: true, // ✅ 쿠키 포함
     });
 
-    const res = NextResponse.json(response.data);
+    const responseData = response.data || { message: 'No response data' };
+    const res = NextResponse.json(responseData);
     const setCookieHeader = response.headers['set-cookie'];
 
     if (setCookieHeader) {
@@ -77,8 +79,12 @@ export async function POST(req: NextRequest) {
     return res;
   } catch (error: any) {
     console.error('❌ Proxy Error:', error.response?.data || error.message);
+
     return NextResponse.json(
-      { message: 'Proxy Error', details: error.message },
+      {
+        message: 'Proxy Error',
+        details: error.response?.data || error.message,
+      },
       { status: error.response?.status || 500 },
     );
   }
