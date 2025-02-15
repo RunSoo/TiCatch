@@ -5,7 +5,7 @@ export async function GET(req: NextRequest) {
   try {
     const backendURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
     const targetPath = req.nextUrl.pathname.replace('/api/proxy', '');
-    const targetURL = `${backendURL}${targetPath}`;
+    const targetURL = `${backendURL}${targetPath}${req.nextUrl.search}`;
 
     const isKakaoLogin = targetPath.includes('/auth/login/kakao');
     const isReissue = targetPath.includes('/auth/reissue');
