@@ -7,22 +7,23 @@ export async function GET(req: NextRequest) {
     const targetPath = req.nextUrl.pathname.replace('/api/proxy', '');
     const targetURL = `${backendURL}${targetPath}`;
 
-    // ✅ 카카오 로그인, 토큰 재발급 요청만 프록시 허용
-    const isAllowedRequest =
-      targetPath.includes('/auth/login/kakao') ||
-      targetPath.includes('/auth/reissue');
+    const isKakaoLogin = targetPath.includes('/auth/login/kakao');
+    const isReissue = targetPath.includes('/auth/reissue');
 
-    if (!isAllowedRequest) {
+    if (!isKakaoLogin && !isReissue) {
       return NextResponse.json(
         { message: 'Only auth requests should go through proxy' },
         { status: 403 },
       );
     }
 
-    const headers: Record<string, string> = {
-      Authorization: req.headers.get('authorization') || '',
-      Cookie: req.headers.get('cookie') || '',
-    };
+    console.log('targetURL: ', targetURL);
+
+    const headers: Record<string, string> = {};
+    if (!isKakaoLogin) {
+      headers['Authorization'] = req.headers.get('authorization') || '';
+      headers['Cookie'] = req.headers.get('cookie') || '';
+    }
 
     console.log('🔄 Proxy GET Request:', targetURL, headers);
 
