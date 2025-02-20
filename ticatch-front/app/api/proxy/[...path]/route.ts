@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
+import https from 'https';
+
+const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
 export async function GET(req: NextRequest) {
   try {
@@ -30,6 +33,7 @@ export async function GET(req: NextRequest) {
     const response = await axios.get(targetURL, {
       headers,
       withCredentials: true,
+      httpsAgent,
     });
 
     const res = NextResponse.json(response.data);
@@ -77,6 +81,7 @@ export async function POST(req: NextRequest) {
     const response = await axios.post(targetURL, undefined, {
       headers,
       withCredentials: true,
+      httpsAgent,
     });
 
     const responseData = response.data || { message: 'No response data' };
